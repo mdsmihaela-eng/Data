@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vocabular Medical — A1/A2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;600&display=swap');
+  :root{--g1:#1B4332;--g2:#2D6A4F;--g3:#40916C;--g4:#D8F3DC;--au:#C9A84C;--au2:#F9C74F;--au3:#FFF3CD;--cr:#FAF6EF;--cr2:#F0EAD6;--txt:#1a1a1a;--txt2:#4a4a4a;--txt3:#7a7a7a;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Sans 3',sans-serif;background:var(--cr);color:var(--txt);min-height:100vh;}
+  .header{background:var(--g1);padding:1.25rem 1.5rem 1rem;}
+  .header-label{font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--au);text-transform:uppercase;margin-bottom:4px;}
+  .header-title{font-family:'Lora',serif;font-size:22px;color:#fff;margin-bottom:2px;}
+  .header-sub{font-size:13px;color:#9fccb0;}
+  .instructions{background:var(--au3);border-left:3px solid var(--au);margin:1rem 1rem 0;border-radius:0 8px 8px 0;padding:.75rem 1rem;font-size:13px;color:var(--g1);line-height:1.7;}
+  .speed-bar{display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;margin:.75rem 1rem 0;background:#fff;border:.5px solid #ddd;border-radius:8px;font-size:13px;color:var(--txt3);}
+  .speed-btn{border:1.5px solid var(--g3);background:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:600;color:var(--g2);cursor:pointer;transition:all .15s;}
+  .speed-btn.active{background:var(--au);border-color:var(--au);color:var(--g1);}
+  .speed-btn:hover:not(.active){background:var(--g4);}
+  .voice-status{margin:.5rem 1rem 0;padding:.4rem .9rem;border-radius:6px;font-size:12px;font-weight:500;}
+  .voice-status.ok{background:var(--g4);color:var(--g2);}
+  .voice-status.warn{background:#FFF3CD;color:#856404;}
+  .show-all-btn{background:var(--g1);color:var(--au);border:none;border-radius:20px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;margin:.75rem 1rem 0;display:inline-block;}
+  .show-all-btn:hover{background:var(--g2);}
+  .section-wrap{padding:.75rem 1rem 0;}
+  .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--g2);text-transform:uppercase;border-bottom:1.5px solid var(--au);padding-bottom:4px;margin-bottom:.75rem;}
+  .item-card{background:#fff;border:.5px solid #e0dbd0;border-radius:10px;padding:.85rem 1rem;margin-bottom:.65rem;}
+  .role-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--au);margin-bottom:4px;}
+  .sentence-ro{font-family:'Lora',serif;font-size:16px;color:var(--txt);margin-bottom:8px;line-height:1.5;}
+  .show-link{font-size:12px;color:var(--g3);cursor:pointer;text-decoration:underline;background:none;border:none;padding:0;font-family:inherit;}
+  .german-box{display:none;margin-top:8px;background:var(--g1);border-radius:8px;padding:.65rem 1rem;align-items:center;justify-content:space-between;gap:10px;}
+  .german-box.visible{display:flex;}
+  .german-text{font-size:15px;color:#fff;font-style:italic;flex:1;line-height:1.5;}
+  .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;margin-top:5px;}
+  .tag-purple{background:#EEEDFE;color:#3C3489;}
+  .tag-teal{background:#E1F5EE;color:#085041;}
+  .tag-amber{background:#FAEEDA;color:#633806;}
+  .tag-coral{background:#FAECE7;color:#712B13;}
+  .tag-blue{background:#E6F1FB;color:#0C447C;}
+  .tag-green{background:#EAF3DE;color:#27500A;}
+  .tag-pink{background:#FBEAF0;color:#72243E;}
+  .play-btn{width:36px;height:36px;border-radius:50%;background:var(--au);border:none;color:var(--g1);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;}
+  .play-btn:hover{background:var(--au2);}
+  .play-btn.playing{background:var(--g3);color:#fff;}
+  .match-score{font-size:13px;color:var(--txt3);margin-bottom:.5rem;}
+  .match-score span{font-weight:600;color:var(--g1);}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem;}
+  .match-col{display:flex;flex-direction:column;gap:.4rem;}
+  .match-card{background:#fff;border:1.5px solid #ddd;border-radius:8px;padding:.55rem .8rem;cursor:pointer;font-size:13px;font-weight:500;color:var(--txt);transition:border-color .15s,background .15s;user-select:none;}
+  .match-card:hover{border-color:var(--g3);background:var(--g4);}
+  .match-card.selected{border-color:#534AB7;background:#EEEDFE;color:#3C3489;}
+  .match-card.matched{border-color:var(--g3);background:var(--g4);color:var(--g2);pointer-events:none;}
+  .match-card.wrong{border-color:#A32D2D;background:#FCEBEB;color:#A32D2D;}
+  .match-sub{font-size:10px;color:var(--txt3);margin-top:1px;font-weight:400;}
+  .reset-btn{background:var(--g1);color:var(--au);border:none;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;display:none;margin-top:.5rem;}
+  .reset-btn:hover{background:var(--g2);}
+  .reset-btn.visible{display:inline-block;}
+  .footer{text-align:center;padding:1.5rem 1rem;font-size:12px;color:var(--txt3);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Deutsch, meine Sprache</div>
+  <div class="header-title">Vocabular Medical — A1/A2</div>
+  <div class="header-sub">Mihaela Preda</div>
+</div>
+
+<div class="instructions">
+  1. Citește propoziția în <strong style="color:var(--g1)">română</strong>.<br>
+  2. Încearcă să o traduci în <strong style="color:var(--g1)">germană</strong>.<br>
+  3. Apasă <em>„Arată germana"</em> pentru a verifica.<br>
+  4. Apasă ▶ pentru a auzi pronunția corectă.
+</div>
+
+<div class="speed-bar">
+  Viteză sonor:
+  <button class="speed-btn active" onclick="setSpeed(0.7,this)">Lent</button>
+  <button class="speed-btn" onclick="setSpeed(1.0,this)">Normal</button>
+  <button class="speed-btn" onclick="setSpeed(1.3,this)">Rapid</button>
+</div>
+<div class="voice-status" id="voice-status">Se verifică vocea germană...</div>
+
+<button class="show-all-btn" onclick="showAll()">▶ Arată toate traducerile</button>
+
+<div class="section-wrap">
+  <div class="section-label">Bloc 3 — Propoziții medicale</div>
+  <div id="bloc3"></div>
+</div>
+
+
+
+
+<div class="section-wrap" style="margin-top:1rem;">
+  <div class="section-label">Lunile anului — Die Monate</div>
+  <div id="bloc-luni"></div>
+</div>
+
+<div class="section-wrap" style="margin-top:1rem;">
+  <div class="section-label">Exerciții — Data și programări</div>
+  <div id="bloc-date"></div>
+</div>
+
+<div class="footer">Vocabular Medical A1/A2 · Deutsch, meine Sprache</div>
+
+<script>
+let speed=0.7, deVoice=null;
+
+function setSpeed(s,btn){speed=s;document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+
+function speak(text,btnEl){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang='de-DE';utt.rate=speed;
+  if(deVoice)utt.voice=deVoice;
+  if(btnEl){
+    btnEl.classList.add('playing');btnEl.innerHTML='&#9632;';
+    utt.onend=()=>{btnEl.classList.remove('playing');btnEl.innerHTML='&#9654;';};
+    utt.onerror=()=>{btnEl.classList.remove('playing');btnEl.innerHTML='&#9654;';};
+  }
+  window.speechSynthesis.speak(utt);
+}
+
+function initVoice(){
+  const status=document.getElementById('voice-status');
+  const tryLoad=()=>{
+    const voices=speechSynthesis.getVoices();
+    const de=voices.find(v=>v.lang.startsWith('de')&&v.name.toLowerCase().includes('google'))||voices.find(v=>v.lang.startsWith('de'));
+    if(de){deVoice=de;status.textContent='✓ Voce germană găsită: '+de.name;status.className='voice-status ok';}
+    else if(voices.length>0){status.textContent='⚠ Voce germană negăsită — se folosește vocea implicită.';status.className='voice-status warn';}
+  };
+  if(speechSynthesis.getVoices().length)tryLoad();
+  speechSynthesis.onvoiceschanged=tryLoad;
+}
+initVoice();
+
+const bloc3Data=[
+  {ro:'Medicația a fost oprită.',de:'Die Medikamente wurden abgesetzt.',tag:'tag-purple',tagText:'Passiv Präteritum',role:'ASISTENTĂ'},
+  {ro:'Medicul a oprit medicamentul.',de:'Der Arzt hat das Medikament abgesetzt.',tag:'tag-teal',tagText:'Perfekt — absetzen',role:'MEDIC'},
+  {ro:'Corpul elimină toxinele.',de:'Der Körper scheidet die Toxine aus.',tag:'tag-amber',tagText:'ausscheiden — separabil',role:'ASISTENTĂ'},
+  {ro:'Îmi predau echipamentul.',de:'Ich gebe die Kleidung ab.',tag:'tag-coral',tagText:'abgeben — separabil',role:'ASISTENTĂ'},
+  {ro:'Unde este Laura? Ea nu este prezentă azi.',de:'Wo ist Laura? Sie ist heute nicht anwesend.',tag:'tag-blue',tagText:'anwesend = prezent',role:'ASISTENTĂ'},
+  {ro:'Vă rugăm aruncați gunoiul aici.',de:'Bitte Müll hier entsorgen.',tag:'tag-green',tagText:'entsorgen = a arunca',role:'ANUNȚ'},
+  {ro:'Pacientul este în camera 21.',de:'Der Patient ist im Zimmer einundzwanzig.',tag:'tag-purple',tagText:'im Zimmer + număr',role:'ASISTENTĂ'},
+  {ro:'Camera dumneavoastră este 152.',de:'Ihr Zimmer ist hundertzweiundfünfzig.',tag:'tag-teal',tagText:'Ihr = politețe',role:'ASISTENTĂ'},
+  {ro:'Mama dumneavoastră este aici.',de:'Ihre Mutter ist hier.',tag:'tag-amber',tagText:'ihre = posesiv feminin',role:'ASISTENTĂ'},
+];
+
+
+
+function escJs(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+
+function buildBloc(id,data){
+  document.getElementById(id).innerHTML=data.map((item,i)=>{
+    const boxId='box-'+id+'-'+i;
+    return `<div class="item-card">
+      ${item.role?`<div class="role-label">${item.role}</div>`:''}
+      <div class="sentence-ro">${item.ro}</div>
+      <button class="show-link" onclick="toggleBox('${boxId}',this)">Arată germana</button>
+      <div class="german-box" id="${boxId}">
+        <div>
+          <div class="german-text">${item.de}</div>
+          
+        </div>
+        <button class="play-btn" onclick="speak('${escJs(item.de)}',this)" title="Ascultă">&#9654;</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleBox(id,btn){
+  const box=document.getElementById(id);
+  box.classList.toggle('visible');
+  btn.textContent=box.classList.contains('visible')?'Ascunde germana':'Arată germana';
+}
+
+function showAll(){
+  document.querySelectorAll('.german-box').forEach(b=>b.classList.add('visible'));
+  document.querySelectorAll('.show-link').forEach(b=>b.textContent='Ascunde germana');
+}
+
+buildBloc('bloc3',bloc3Data);
+
+const dateData=[
+  {ro:'Azi suntem în 3 mai.',de:'Heute ist der dritte Mai.',role:'HEUTE IST'},
+  {ro:'Azi suntem în 15 august.',de:'Heute ist der fünfzehnte August.',role:'HEUTE IST'},
+  {ro:'Azi suntem în 30 a opta.',de:'Heute ist der dreißigste Achte.',role:'HEUTE IST'},
+  {ro:'Azi suntem în 7 a doua.',de:'Heute ist der siebte Zweite.',role:'HEUTE IST'},
+  {ro:'Am programare pe 12 martie.',de:'Ich habe einen Termin am zwölften März.',role:'TERMIN'},
+  {ro:'Am programare pe 20 octombrie.',de:'Ich habe einen Termin am zwanzigsten Oktober.',role:'TERMIN'},
+  {ro:'Ziua mea este pe 9 a opta.',de:'Mein Geburtstag ist am neunten Achten.',role:'GEBURTSTAG'},
+  {ro:'Ziua mea este pe 17 a doua.',de:'Mein Geburtstag ist am siebzehnten Zweiten.',role:'GEBURTSTAG'},
+];
+
+buildBloc('bloc-date', dateData);
+
+const luniData=[
+  {ro:'ianuarie',de:'Januar'},
+  {ro:'februarie',de:'Februar'},
+  {ro:'martie',de:'März'},
+  {ro:'aprilie',de:'April'},
+  {ro:'mai',de:'Mai'},
+  {ro:'iunie',de:'Juni'},
+  {ro:'iulie',de:'Juli'},
+  {ro:'august',de:'August'},
+  {ro:'septembrie',de:'September'},
+  {ro:'octombrie',de:'Oktober'},
+  {ro:'noiembrie',de:'November'},
+  {ro:'decembrie',de:'Dezember'},
+];
+
+function buildLuni(){
+  document.getElementById('bloc-luni').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.5rem;">
+      ${luniData.map((item,i)=>`
+        <div style="background:#fff;border:.5px solid #e0dbd0;border-radius:10px;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <div style="font-size:13px;color:var(--txt3);margin-bottom:2px;">${item.ro}</div>
+            <div style="font-family:'Lora',serif;font-size:17px;color:var(--g1);font-weight:600;">${item.de}</div>
+          </div>
+          <button class="play-btn" onclick="speak('${item.de}',this)" title="Ascultă">&#9654;</button>
+        </div>`).join('')}
+    </div>`;
+}
+buildLuni();
+
+
+</script>
+</body>
+</html>
